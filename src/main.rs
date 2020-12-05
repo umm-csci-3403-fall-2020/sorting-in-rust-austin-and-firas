@@ -174,9 +174,31 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
     // vector, and then push all the remaining elements from the
     // other vector onto the result.
 
-    // This is totally wrong and will not sort. You should replace it
-    // with something useful. :)
-    return xs;
+    let mut output = Vec::<T>::new();
+    let mut left = 0; // there are better approaches, but i wanted to keep it consistent with given code
+    let mut right = 0;
+
+    while left < xs.len() && right < ys.len() {
+        if xs[left] < ys[right] {
+            output.push(xs[left]);
+            left += 1;
+        } else {
+            output.push(ys[right]);
+            right += 1;
+        }
+    }
+
+    while left < xs.len() {
+        output.push(xs[left]);
+        left += 1;
+    }
+
+    while right < ys.len() {
+        output.push(ys[right]);
+        right += 1;
+    }
+
+    return output;
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
