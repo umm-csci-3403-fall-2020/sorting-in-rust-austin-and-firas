@@ -1,5 +1,5 @@
 use rand::{thread_rng, Rng};
-use std::time::{Instant};
+use std::time::Instant;
 
 fn main() {
     let size = 750000; // 100000;
@@ -8,21 +8,33 @@ fn main() {
     let mut u = v.clone();
     let before_insertion = Instant::now();
     insertion_sort(&mut u);
-    println!("Elapsed time for insertion sort was {:?}.", before_insertion.elapsed());
+    println!(
+        "Elapsed time for insertion sort was {:?}.",
+        before_insertion.elapsed()
+    );
 
     let mut w = v.clone();
     // println!("{:?}", &w);
     let before_quicksort = Instant::now();
     quicksort(&mut w);
-    println!("Elapsed time for quicksort was {:?}.", before_quicksort.elapsed());
+    println!(
+        "Elapsed time for quicksort was {:?}.",
+        before_quicksort.elapsed()
+    );
     // println!("{:?}", &w);
 
     let before_merged = Instant::now();
     let merged_v = merge_sort(&v);
-    println!("Elapsed time for mergesort was {:?}.", before_merged.elapsed());
+    println!(
+        "Elapsed time for mergesort was {:?}.",
+        before_merged.elapsed()
+    );
     // println!("{:?}", v);
     // println!("{:?}", merged_v);
-    println!("Is the original, random list in order?: {:?}", is_sorted(&v));
+    println!(
+        "Is the original, random list in order?: {:?}",
+        is_sorted(&v)
+    );
     println!("Was insertion sort in order?: {:?}", is_sorted(&u));
     println!("Was quicksort in order?: {:?}", is_sorted(&w));
     println!("Was mergesort in order?: {:?}", is_sorted(&merged_v));
@@ -49,14 +61,14 @@ fn insertion_sort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
         // j is where we are in the bubbling process, so we
         // start with j=i.
         let mut j = i;
-        // If j > 0 we might still need to move left, so continue. 
+        // If j > 0 we might still need to move left, so continue.
         // But _only_ continue if v[j] _should_ move left, i.e.,
         // if it's less than the value to its left (so those two
         // are out of order.)
-        while j > 0 && v[j-1] > v[j] {
+        while j > 0 && v[j - 1] > v[j] {
             // Since j-1 and j are out of order swap them, and move
             // j one to the left to continue the bubbling if necessary.
-            v.swap(j-1, j);
+            v.swap(j - 1, j);
             j = j - 1;
         }
     }
@@ -82,7 +94,7 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
     //   (All i | smaller ≤ i < length : v[i] ≥ pivot)
     // Now you can recursively call quicksort on the front using
     // the slice v[0..smaller] to sort that part, and call it
-    // recursively on the slice v[smaller+1..length] to sort 
+    // recursively on the slice v[smaller+1..length] to sort
     // the back half. (You need the +1 to ensure that both slices
     // are smaller than the original array; without it you can
     // end up with infinite recursion.)
@@ -94,18 +106,24 @@ fn quicksort<T: PartialOrd + std::fmt::Debug>(v: &mut [T]) {
         return;
     }
 
-    // Now choose a pivot and do the organizing.
-    
-    // ...
+    let mut smaller = 0;
+    let mut larger = length - 1;
 
-    let smaller = 99999999; // Totally wrong – you should fix this.
-
+    while smaller < larger {
+        if v[smaller] > v[smaller + 1] {
+            v.swap(smaller, smaller + 1); // compares and changes pivot position if needed
+            smaller = smaller + 1;
+        } else {
+            v.swap(smaller + 1, larger); // compares and changes pivot position if needed
+            larger = larger - 1;
+        }
+    }
     // Sort all the items < pivot
     quicksort(&mut v[0..smaller]);
     // Sort all the items ≥ pivot, *not* including the
     // pivot value itself. If we don't include the +1
     // here you can end up in infinite recursions.
-    quicksort(&mut v[smaller+1..length]);
+    quicksort(&mut v[smaller + 1..length]);
 }
 
 // Mergesort can't be done "in place", so it needs to return a _new_
@@ -137,9 +155,9 @@ fn merge_sort<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(v: &[T]) -> V
     }
     let middle = v.len() / 2; //rounds down by default
     let left = merge_sort(&v[0..middle]);
-    let right = merge_sort(&v[middle .. len]);
+    let right = merge_sort(&v[middle..len]);
     let result = merge(left, right);
-    return result
+    return result;
 }
 
 fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Vec<T>) -> Vec<T> {
@@ -156,25 +174,47 @@ fn merge<T: PartialOrd + std::marker::Copy + std::fmt::Debug>(xs: Vec<T>, ys: Ve
     // vector, and then push all the remaining elements from the
     // other vector onto the result.
 
-    // This is totally wrong and will not sort. You should replace it
-    // with something useful. :)
-    return xs;
+    let mut output = Vec::<T>::new();
+    let mut left = 0; // there are better approaches, but i wanted to keep it consistent with given code
+    let mut right = 0;
+
+    while left < xs.len() && right < ys.len() {
+        if xs[left] < ys[right] {
+            output.push(xs[left]);
+            left += 1;
+        } else {
+            output.push(ys[right]);
+            right += 1;
+        }
+    }
+
+    while left < xs.len() {
+        output.push(xs[left]);
+        left += 1;
+    }
+
+    while right < ys.len() {
+        output.push(ys[right]);
+        right += 1;
+    }
+
+    return output;
 }
 
 fn is_sorted<T: PartialOrd>(slice: &[T]) -> bool {
     let len = slice.len();
-    for i in 0..len-1{
-        if slice[i] > slice[i+1]{
+    for i in 0..len - 1 {
+        if slice[i] > slice[i + 1] {
             return false;
         }
     }
     return true;
 }
 
-fn generate_random_array(len: i32, min: i32, max:i32) -> Vec<i32> {
+fn generate_random_array(len: i32, min: i32, max: i32) -> Vec<i32> {
     let mut rng = thread_rng();
     let mut v = Vec::new();
-    for _i in 0..len{
+    for _i in 0..len {
         v.push(rng.gen_range(min, max));
     }
     return v;
@@ -187,9 +227,9 @@ mod tests {
         use super::*;
         #[test]
         fn empty() {
-            let mut input : [i32; 0] = [];
+            let mut input: [i32; 0] = [];
             insertion_sort(&mut input);
-            let expected : [i32; 0] = [];
+            let expected: [i32; 0] = [];
 
             assert_eq!(expected, input);
         }
@@ -217,9 +257,9 @@ mod tests {
         use super::*;
         #[test]
         fn empty() {
-            let mut input : [i32; 0] = [];
+            let mut input: [i32; 0] = [];
             quicksort(&mut input);
-            let expected : [i32; 0] = [];
+            let expected: [i32; 0] = [];
 
             assert_eq!(expected, input);
         }
@@ -247,9 +287,9 @@ mod tests {
         use super::*;
         #[test]
         fn empty() {
-            let input : [i32; 0] = [];
+            let input: [i32; 0] = [];
             let result = merge_sort(&input);
-            let expected : Vec<i32> = Vec::new();
+            let expected: Vec<i32> = Vec::new();
 
             assert_eq!(expected, result);
         }
